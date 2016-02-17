@@ -24,6 +24,8 @@
 # python 2 support via python-future
 from __future__ import absolute_import, unicode_literals
 
+import inspect
+
 try:
     # from python version >= 3.0
     from collections import abc
@@ -40,7 +42,12 @@ except ImportError:
 @singledispatch
 def contains(container, item):
     """Extends ``operator.contains`` by trying very hard to find ``item`` inside container."""
-    return item in vars(container).values()
+    contained = False
+    try:
+        contained = instance_contains(container, item)
+    except:
+        pass
+    return contained
 
 
 @contains.register(abc.Container)
@@ -61,6 +68,11 @@ def mapping_contains(container, item):
 @contains.register(str)
 def str_contains(container, item):
     return item in set(container)
+
+
+def instance_contains(container, item):
+    """Search into instance attributes and properties and class attributes."""
+    return item in (p for _, p in inspect.getmembers(container))
 
 
 class Container(object):

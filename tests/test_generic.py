@@ -22,16 +22,33 @@ def test_mapping_contains():
     assert 'value' not in generic.Container({'value': 'other'})
 
 
-def test_object_contains():
-    class C(object):
-        pass
-    obj = C()
-    obj.attr = 'value'
-    assert 'value' in generic.Container(obj)
-    assert 'other' not in generic.Container(obj)
-
-
 def test_str_contains():
     assert 'v' in generic.Container('value')
     assert 'k' not in generic.Container('value')
     assert 'value' not in generic.Container('other_value!!')
+
+
+def test_instance_contains():
+    # instance attributes
+    class A(object):
+        pass
+    instance = A()
+    instance.attr = 'value'
+    assert 'value' in generic.Container(instance)
+    assert 'other' not in generic.Container(instance)
+
+    # instance properties
+    class B(object):
+        @property
+        def attr(self):
+            return 'value'
+    instance = B()
+    assert 'value' in generic.Container(instance)
+    assert 'other' not in generic.Container(instance)
+
+    # class attributes
+    class C(object):
+        attr = 'value'
+    instance = C()
+    assert 'value' in generic.Container(instance)
+    assert 'other' not in generic.Container(instance)
