@@ -39,12 +39,8 @@ except ImportError:
 
 @singledispatch
 def contains(container, item):
+    """Extends ``operator.contains`` by trying very hard to find ``item`` inside container."""
     return item in vars(container).values()
-
-
-@contains.register(str)
-def str_contains(container, item):
-    return item in set(container)
 
 
 @contains.register(abc.Container)
@@ -60,6 +56,11 @@ def iterator_contains(container, item):
 @contains.register(abc.Mapping)
 def mapping_contains(container, item):
     return item in container.values()
+
+
+@contains.register(str)
+def str_contains(container, item):
+    return item in set(container)
 
 
 class Container(object):
