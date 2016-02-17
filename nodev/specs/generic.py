@@ -25,21 +25,31 @@
 from __future__ import absolute_import, unicode_literals
 
 try:
+    # from python version >= 3.0
     from collections import abc
 except ImportError:
     import collections as abc
 
-import singledispatch
+try:
+    # from python version >= 3.5
+    from functools import singledispatch
+except ImportError:
+    from singledispatch import singledispatch
 
 
-@singledispatch.singledispatch
+@singledispatch
 def contains(container, item):
     return item in vars(container).values()
 
 
 @contains.register(abc.Container)
-def iterable_contains(container, item):
+def container_contains(container, item):
     return item in container
+
+
+@contains.register(abc.Iterator)
+def generator_contains(container, item):
+    return item in list(container)
 
 
 @contains.register(abc.Mapping)
