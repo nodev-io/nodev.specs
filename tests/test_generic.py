@@ -29,3 +29,9 @@ def test_object_contains():
     obj.attr = 'value'
     assert 'value' in generic.Container(obj)
     assert 'other' not in generic.Container(obj)
+
+
+def test_str_contains():
+    assert 'v' in generic.Container('value')
+    assert 'k' not in generic.Container('value')
+    assert 'value' not in generic.Container('other_value!!')

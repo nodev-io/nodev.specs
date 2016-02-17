@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2015-2016 Alessandro Amici
+# Copyright (c) 2015-2016 Alessandro Amici.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -42,14 +42,19 @@ def contains(container, item):
     return item in vars(container).values()
 
 
+@contains.register(str)
+def str_contains(container, item):
+    return item in set(container)
+
+
 @contains.register(abc.Container)
 def container_contains(container, item):
     return item in container
 
 
 @contains.register(abc.Iterator)
-def generator_contains(container, item):
-    return item in list(container)
+def iterator_contains(container, item):
+    return item in container
 
 
 @contains.register(abc.Mapping)
