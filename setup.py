@@ -23,9 +23,11 @@ setup(
     download_url='https://github.com/nodev-io/nodev.specs/archive/%s.tar.gz' % version,
     description="nodev helpers to write specification tests.",
     long_description=read('README.rst'),
-    packages=find_packages(),
+    namespace_packages=['nodev'],
+    packages=['nodev', 'nodev.specs'],
     install_requires=[
         'future',
+        'singledispatch',
     ],
     zip_safe=True,
     classifiers=[

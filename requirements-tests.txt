@@ -1,0 +1,5 @@
+pytest>=2.8.1
+pytest-cov>=2.2.0
+pytest-pep8>=1.0.0
+pytest-flakes>=1.0.0
+pytest-mccabe>=0.1

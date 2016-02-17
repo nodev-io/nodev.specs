@@ -24,11 +24,15 @@
 # python 2 support via python-future
 from __future__ import absolute_import, unicode_literals
 
-from collections import abc
-import functools
+try:
+    from collections import abc
+except ImportError:
+    import collections as abc
+
+import singledispatch
 
 
-@functools.singledispatch
+@singledispatch.singledispatch
 def contains(container, item):
     return item in vars(container).values()
 
