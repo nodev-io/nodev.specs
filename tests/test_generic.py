@@ -12,10 +12,10 @@ def test_mapping_contains(mapping_contains=generic.mapping_contains):
     assert not mapping_contains({'key': 'value'}, 'other')
 
 
-def test_str_strict_contains(str_strict_contains=generic.str_strict_contains):
-    assert str_strict_contains('value', 'v')
-    assert not str_strict_contains('value', 'k')
-    assert not str_strict_contains('value', 'val')
+def test_strict_contains(strict_contains=generic.strict_contains):
+    assert strict_contains('value', 'v')
+    assert not strict_contains('value', 'k')
+    assert not strict_contains('value', 'val')
 
 
 def test_instance_contains_attributes(instance_contains=generic.instance_contains):
@@ -45,44 +45,47 @@ def test_instance_contains_properties(instance_contains=generic.instance_contain
     assert not instance_contains(instance, 'other')
 
 
-def test_instance_contains_methods():
-    class B(object):
-        def attr(self):
-            return 'value'
-    instance = B()
-    assert generic.instance_contains(instance, 'value')
-    assert not generic.instance_contains(instance, 'other')
+def test_contains(contains=generic.contains):
+    assert contains('value', 'value')
+    test_strict_contains(generic.contains)
+    assert contains(['value'], 'value')
+    assert contains(iter(['value']), 'value')
+    test_mapping_contains(contains)
+    test_instance_contains_attributes(contains)
+    test_instance_contains_properties(contains)
 
 
-def test_contains():
-    assert generic.contains('value', 'value')
-    test_str_strict_contains(generic.contains)
-    assert generic.contains(['value'], 'value')
-    assert generic.contains(iter(['value']), 'value')
-    test_mapping_contains(generic.contains)
-    test_instance_contains_properties(generic.contains)
+def test_flat_contains(flat_contains=generic.flat_contains):
+    test_contains(flat_contains)
+    assert flat_contains([('key', 'value')], 'value')
+    assert flat_contains({'key': ['value']}, 'value')
+
+    class C(object):
+        attr = {'key': 'value'}
+
+    assert flat_contains(C(), 'value')
 
 
-def test_container():
-    assert 'value' in generic.Container('value')
-    assert 'other' not in generic.Container('value')
+def test_container(container=generic.Container):
+    assert 'value' in container('value')
+    assert 'other' not in container('value')
 
-    assert 'value' in generic.Container(iter(['value']))
-    assert 'other' not in generic.Container(iter(['value']))
+    assert 'value' in container(iter(['value']))
+    assert 'other' not in container(iter(['value']))
 
-    assert 'value' in generic.Container({'key': 'value'})
-    assert 'other' not in generic.Container({'key': 'value'})
+    assert 'value' in container({'key': 'value'})
+    assert 'other' not in container({'key': 'value'})
 
-    assert 'v' in generic.Container('value')
-    assert 'k' not in generic.Container('value')
+    assert 'v' in container('value')
+    assert 'k' not in container('value')
 
     # instance attributes
     class A(object):
         pass
     instance = A()
     instance.attr = 'value'
-    assert 'value' in generic.Container(instance)
-    assert 'other' not in generic.Container(instance)
+    assert 'value' in container(instance)
+    assert 'other' not in container(instance)
 
     # instance properties
     class B(object):
@@ -90,12 +93,16 @@ def test_container():
         def attr(self):
             return 'value'
     instance = B()
-    assert 'value' in generic.Container(instance)
-    assert 'other' not in generic.Container(instance)
+    assert 'value' in container(instance)
+    assert 'other' not in container(instance)
 
     # class attributes
     class C(object):
         attr = 'value'
     instance = C()
-    assert 'value' in generic.Container(instance)
-    assert 'other' not in generic.Container(instance)
+    assert 'value' in container(instance)
+    assert 'other' not in container(instance)
+
+
+def test_flat_container():
+    test_container(generic.FlatContainer)

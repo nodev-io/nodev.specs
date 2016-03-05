@@ -23,7 +23,6 @@
 
 # python 2 support via python-future
 from __future__ import absolute_import, unicode_literals
-from builtins import super
 
 import inspect
 
@@ -35,27 +34,16 @@ except ImportError:
 
 
 def mapping_contains(container, item):
-    assert isinstance(container, abc.Mapping)
     return item in container.values() or item in container
 
 
-def str_strict_contains(container, item):
-    assert isinstance(container, str)
-    return item in list(container)
+def strict_contains(container, item):
+    return item in iter(container)
 
 
 def instance_contains(container, item):
     """Search into instance attributes, properties and return values of no-args methods."""
-    for _, member in inspect.getmembers(container):
-        if item == member:
-            return True
-        if callable(member):
-            try:
-                if item == member():
-                    return True
-            except:
-                pass
-    return False
+    return item in (member for _, member in inspect.getmembers(container))
 
 
 def contains(container, item):
@@ -68,7 +56,7 @@ def contains(container, item):
     # standard containment except special cases
     if isinstance(container, str):
         # str __contains__ includes substring match that we don't count as containment
-        if str_strict_contains(container, item):
+        if strict_contains(container, item):
             return True
     elif isinstance(container, abc.Container) or isinstance(container, abc.Iterable):
         if item in container:
@@ -82,6 +70,27 @@ def contains(container, item):
     return instance_contains(container, item)
 
 
+def flat_contains(container, item):
+    if contains(container, item):
+        return True
+
+    if isinstance(container, abc.Iterable):
+        for content in container:
+            if contains(content, item):
+                return True
+
+    if isinstance(container, abc.Mapping):
+        for content in container.values():
+            if contains(content, item):
+                return True
+
+    for _, content in inspect.getmembers(container):
+        if contains(content, item):
+            return True
+
+    return False
+
+
 class Container(object):
     def __init__(self, container):
         self.container = container
@@ -90,30 +99,6 @@ class Container(object):
         return contains(self.container, item)
 
 
-def generate_items(object):
-    if isinstance(object, abc.Mapping):
-        for key, value in object.items():
-            yield key
-            yield value
-    elif isinstance(object, abc.Iterable):
-        for item in object:
-            yield item
-    for name, attr in inspect.getmembers(object):
-        if not name.startswith('_'):
-            yield attr
-
-
-def generate_flat_items(object):
-    for item in generate_items(object):
-        yield item
-        try:
-            for subitem in generate_items(item):
-                yield subitem
-        except:
-            pass
-
-
-class FlatContainer(tuple):
-    def __new__(cls, object):
-        super().__new__(generate_flat_items(object))
-
+class FlatContainer(Container):
+    def __contains__(self, item):
+        return flat_contains(self.container, item)
