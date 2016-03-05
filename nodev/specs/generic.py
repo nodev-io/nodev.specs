@@ -33,43 +33,53 @@ try:
 except ImportError:
     import collections as abc
 
-try:
-    # from python version >= 3.5
-    from functools import singledispatch
-except ImportError:
-    from singledispatch import singledispatch
 
-
-@singledispatch
-def contains(container, item):
-    """Extends ``operator.contains`` by trying very hard to find ``item`` inside container."""
-    contained = False
-    try:
-        contained = instance_contains(container, item)
-    except:
-        pass
-    return contained
-
-
-@contains.register(abc.Container)
-@contains.register(abc.Iterator)
-def container_contains(container, item):
-    return item in container
-
-
-@contains.register(abc.Mapping)
 def mapping_contains(container, item):
-    return item in container.values()
+    assert isinstance(container, abc.Mapping)
+    return item in container.values() or item in container
 
 
-@contains.register(str)
-def str_contains(container, item):
-    return item in set(container)
+def str_strict_contains(container, item):
+    assert isinstance(container, str)
+    return item in list(container)
 
 
 def instance_contains(container, item):
-    """Search into instance attributes and properties and class attributes."""
-    return item in (p for _, p in inspect.getmembers(container))
+    """Search into instance attributes, properties and return values of no-args methods."""
+    for _, member in inspect.getmembers(container):
+        if item == member:
+            return True
+        if callable(member):
+            try:
+                if item == member():
+                    return True
+            except:
+                pass
+    return False
+
+
+def contains(container, item):
+    """Extends ``operator.contains`` by trying very hard to find ``item`` inside container."""
+
+    # equality counts as containment
+    if container == item:
+        return True
+
+    # standard containment except special cases
+    if isinstance(container, str):
+        # str __contains__ includes substring match that we don't count as containment
+        if str_strict_contains(container, item):
+            return True
+    elif isinstance(container, abc.Container) or isinstance(container, abc.Iterable):
+        if item in container:
+            return True
+
+    # search matches more thoroughly in known containers
+    if isinstance(container, abc.Mapping) and mapping_contains(container, item):
+        return True
+
+    # search matches in generic instances
+    return instance_contains(container, item)
 
 
 class Container(object):
