@@ -23,6 +23,7 @@
 
 # python 2 support via python-future
 from __future__ import absolute_import, unicode_literals
+from builtins import super
 
 import inspect
 
@@ -51,12 +52,8 @@ def contains(container, item):
 
 
 @contains.register(abc.Container)
-def container_contains(container, item):
-    return item in container
-
-
 @contains.register(abc.Iterator)
-def iterator_contains(container, item):
+def container_contains(container, item):
     return item in container
 
 
@@ -81,3 +78,32 @@ class Container(object):
 
     def __contains__(self, item):
         return contains(self.container, item)
+
+
+def generate_items(object):
+    if isinstance(object, abc.Mapping):
+        for key, value in object.items():
+            yield key
+            yield value
+    elif isinstance(object, abc.Iterable):
+        for item in object:
+            yield item
+    for name, attr in inspect.getmembers(object):
+        if not name.startswith('_'):
+            yield attr
+
+
+def generate_flat_items(object):
+    for item in generate_items(object):
+        yield item
+        try:
+            for subitem in generate_items(item):
+                yield subitem
+        except:
+            pass
+
+
+class FlatContainer(tuple):
+    def __new__(cls, object):
+        super().__new__(generate_flat_items(object))
+
