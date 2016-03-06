@@ -79,6 +79,8 @@ Project resources
 ============= ======================
 Support       https://stackoverflow.com/search?q=nodev
 Development   https://github.com/nodev-io/nodev.specs
+Discussion    To be decided, see issue `#15 <https://github.com/nodev-io/pytest-nodev/issues/15>`_
+              of the pytest-nodev repository.
 Download      https://pypi.python.org/pypi/nodev.specs
 Code quality  .. image:: https://api.travis-ci.org/nodev-io/nodev.specs.svg?branch=master
                 :target: https://travis-ci.org/nodev-io/nodev.specs/branches
