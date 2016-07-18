@@ -12,24 +12,24 @@
 
 .. NOTE: only the first couple of lines of the README are shown on GitHub mobile
 
-nodev.specs helps you writing robust tests that describe the abstract behaviour of your code
+nodev.specs helps you write robust tests that describe the abstract behaviour of your code
 leaving many implementation details out of your tests.
 
 The general idea is best explained with an example,
-let's write a specification test for the following function `skip_comments` that
+let's write a specification test for the following function ``skip_comments`` that
 returns the non-comment part of every line in the input file::
 
     def skip_comments(stream):
         return [line.partition('#')[0] for line in stream]
 
-Without nodev.specs a simple unit test may look like the following::
+The simplest unit test may look like the following::
 
     def test_skip_comments():
         assert skip_comments(['# comment']) == ['']
         assert skip_comments(['value # comment']) == ['value ']
         assert skip_comments(['value 1', '', 'value 2']) == ['value 1', '', value 2']
 
-Such a unit test is much more tied to current `skip_comments` implementation than it needs to be
+Such a unit test is much more tied to current ``skip_comments`` implementation than it needs to be
 and the test will need update every time a tiny feature is added,
 like turning the function into a generator::
 
@@ -45,7 +45,7 @@ This can be fixed by re-writing the test in more generic way::
         assert 'value 1' in skip_comments(['value 1', '', 'value 2'])
         assert 'value 2' in skip_comments(['value 1', '', 'value 2'])
 
-Let's re-write the test making use of the `nodev.specs.FlatContainer` helper::
+Let's re-write the test making use of the ``nodev.specs.FlatContainer`` helper::
 
     def test_skip_comments():
         assert '' in FlatContainer(skip_comments(['# comment']))
