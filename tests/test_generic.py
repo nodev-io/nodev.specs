@@ -106,3 +106,6 @@ def test_container(container=generic.Container):
 
 def test_flat_container():
     test_container(generic.FlatContainer)
+
+    assert 'value' in generic.FlatContainer([('value', 0)])
+    assert 'value' in generic.FlatContainer(iter([('value', 0)]))
