@@ -26,6 +26,7 @@ from __future__ import absolute_import, unicode_literals
 
 import inspect
 
+
 try:
     # from python version >= 3.0
     from collections import abc
@@ -49,7 +50,7 @@ def instance_contains(container, item):
 def contains(container, item):
     """Extends ``operator.contains`` by trying very hard to find ``item`` inside container."""
 
-    # equality counts as containment
+    # equality counts as containment and is usually non destructive
     if container == item:
         return True
 
@@ -71,16 +72,19 @@ def contains(container, item):
 
 
 def flat_contains(container, item):
-    if contains(container, item):
+    # equality counts as containment and is usually non destructive
+    if container == item:
         return True
 
-    if isinstance(container, abc.Iterable):
-        for content in container:
+    # iterating on a mapping is usually non destructive
+    if isinstance(container, abc.Mapping):
+        for content in container.values():
             if contains(content, item):
                 return True
 
-    if isinstance(container, abc.Mapping):
-        for content in container.values():
+    # iterating on an itarator is destructive, but accounts form most of the sensible use cases
+    if isinstance(container, abc.Iterable):
+        for content in container:
             if contains(content, item):
                 return True
 
@@ -88,7 +92,7 @@ def flat_contains(container, item):
         if contains(content, item):
             return True
 
-    return False
+    return contains(container, item)
 
 
 class Container(object):
