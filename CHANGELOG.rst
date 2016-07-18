@@ -1,8 +1,8 @@
 
-0.3.0 (unreleased)
+0.3.0 (2016-07-18)
 ------------------
 
-- Nothing changed yet.
+- Better support for iterators.
 
 
 0.2.0 (2016-03-05)

@@ -3,4 +3,5 @@ include *.txt
 include *.rst
 include LICENSE
 include tox.ini
+include *.yml
 recursive-include tests *.py
