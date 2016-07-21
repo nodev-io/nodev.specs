@@ -11,7 +11,7 @@ def read(fname):
     return codecs.open(file_path, encoding='utf-8').read()
 
 
-version = '0.3.1'
+version = '0.3.2.dev0'
 
 setup(
     name='nodev.specs',
