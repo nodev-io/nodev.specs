@@ -27,7 +27,6 @@ setup(
     packages=['nodev', 'nodev.specs'],
     install_requires=[
         'future',
-        'singledispatch',
     ],
     zip_safe=True,
     classifiers=[
@@ -46,5 +45,5 @@ setup(
         'Operating System :: OS Independent',
         'License :: OSI Approved :: MIT License',
     ],
-    keywords='source code search-by-tests nodev',
+    keywords='test-driven source code search nodev',
 )

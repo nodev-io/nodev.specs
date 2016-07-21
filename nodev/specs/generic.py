@@ -54,18 +54,21 @@ def contains(container, item):
     if container == item:
         return True
 
+    # testing mapping containment is usually non destructive
+    if isinstance(container, abc.Mapping) and mapping_contains(container, item):
+        return True
+
     # standard containment except special cases
     if isinstance(container, str):
         # str __contains__ includes substring match that we don't count as containment
         if strict_contains(container, item):
             return True
-    elif isinstance(container, abc.Container) or isinstance(container, abc.Iterable):
-        if item in container:
-            return True
-
-    # search matches more thoroughly in known containers
-    if isinstance(container, abc.Mapping) and mapping_contains(container, item):
-        return True
+    else:
+        try:
+            if item in container:
+                return True
+        except Exception:
+            pass
 
     # search matches in generic instances
     return instance_contains(container, item)
@@ -76,17 +79,19 @@ def flat_contains(container, item):
     if container == item:
         return True
 
-    # iterating on a mapping is usually non destructive
+    # calling a mapping's values method is usually non destructive
     if isinstance(container, abc.Mapping):
         for content in container.values():
             if contains(content, item):
                 return True
 
     # iterating on an itarator is destructive, but accounts form most of the sensible use cases
-    if isinstance(container, abc.Iterable):
+    try:
         for content in container:
             if contains(content, item):
                 return True
+    except TypeError:
+        pass
 
     for _, content in inspect.getmembers(container):
         if contains(content, item):
