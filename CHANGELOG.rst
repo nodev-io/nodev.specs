@@ -1,8 +1,8 @@
 
-0.3.1 (unreleased)
+0.3.1 (2016-07-22)
 ------------------
 
-- Nothing changed yet.
+- ``flat_contains`` is now more robust with respect to broken code.
 
 
 0.3.0 (2016-07-18)
